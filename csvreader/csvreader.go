@@ -3,6 +3,7 @@ package csvreader
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -13,8 +14,8 @@ type OtchEntity struct {
 	Id           int
 	Principal    string
 	Nomenklature string
-	Quantity     string
-	Price        string
+	Quantity     float64
+	Price        float64
 }
 
 func MatOtchCsvRead(path string) (result []OtchEntity, err error) {
@@ -46,20 +47,32 @@ func MatOtchCsvRead(path string) (result []OtchEntity, err error) {
 		if i > 11 {
 			res.Principal = dep
 
-			i, err = strconv.Atoi(validator(row[0]))
+			i, err = strconv.Atoi(string2NumValidator(row[0]))
 			if err != nil {
 				return
 			}
 			res.Num = i
-			i, err = strconv.Atoi(validator(row[1]))
+			i, err = strconv.Atoi(string2NumValidator(row[1]))
 			if err != nil {
 				return
 			}
 			res.Id = i
 
 			res.Nomenklature = row[4]
-			res.Quantity = row[15]
-			res.Price = row[16]
+
+			f, err := strconv.ParseFloat(string2NumValidator(row[15]), 64)
+			if err != nil {
+				return nil, err
+			}
+			res.Quantity = f
+
+			f, err = strconv.ParseFloat(string2NumValidator(row[16]), 64)
+			if err != nil {
+				log.Println(row)
+				return nil, err
+			}
+
+			res.Price = f
 
 			result = append(result, res)
 		}
@@ -68,8 +81,11 @@ func MatOtchCsvRead(path string) (result []OtchEntity, err error) {
 	return
 }
 
-func validator(s string) string {
+func string2NumValidator(s string) string {
 	s = strings.Replace(s, " ", "", -1)
 	s = strings.Replace(s, ",", ".", -1)
+	if s == "" {
+		s = "0"
+	}
 	return s
 }
