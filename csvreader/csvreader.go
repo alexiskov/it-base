@@ -71,7 +71,6 @@ func MatOtchCsvRead(path string) (result []OtchEntity, err error) {
 				log.Println(row)
 				return nil, err
 			}
-
 			res.Price = f
 
 			result = append(result, res)
@@ -82,8 +81,9 @@ func MatOtchCsvRead(path string) (result []OtchEntity, err error) {
 }
 
 func string2NumValidator(s string) string {
-	s = strings.Replace(s, " ", "", -1)
-	s = strings.Replace(s, ",", ".", -1)
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\u00a0", "")
+	s = strings.ReplaceAll(s, ",", ".")
 	if s == "" {
 		s = "0"
 	}
