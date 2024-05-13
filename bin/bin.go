@@ -3,6 +3,7 @@ package bin
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type ReportEntity struct {
@@ -19,6 +20,7 @@ type Report []ReportEntity
 type Inflater interface {
 	InflateFromCSV(data [][6]string) error
 	GetReport() Report
+	Search(searchStr string) Report
 }
 
 func New() *Report {
@@ -66,4 +68,28 @@ func (result *Report) InflateFromCSV(data [][6]string) error {
 
 func (result Report) GetReport() Report {
 	return result
+}
+
+func (result Report) Search(searchStr string) (res Report) {
+	for _, row := range result {
+		if strings.Contains(strconv.Itoa(row.Num), searchStr) {
+			res = append(res, row)
+		}
+		if strings.Contains(strconv.Itoa(row.Id), searchStr) {
+			res = append(res, row)
+		}
+		if strings.Contains(strconv.FormatFloat(row.Quantity, 'f', -1, 64), searchStr) {
+			res = append(res, row)
+		}
+		if strings.Contains(strconv.FormatFloat(row.Price, 'f', -1, 64), searchStr) {
+			res = append(res, row)
+		}
+		if strings.Contains(row.Principal, searchStr) {
+			res = append(res, row)
+		}
+		if strings.Contains(row.Nomenklature, searchStr) {
+			res = append(res, row)
+		}
+	}
+	return
 }
