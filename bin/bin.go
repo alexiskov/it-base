@@ -20,9 +20,9 @@ type Report []ReportEntity
 type Inflater interface {
 	InflateFromCSV(data [][6]string) error
 	GetReport() Report
-	Search(searchStr string) Report
 }
 
+// конструктор
 func New() *Report {
 	return &Report{}
 }
@@ -66,29 +66,24 @@ func (result *Report) InflateFromCSV(data [][6]string) error {
 	return nil
 }
 
+// возвращает данные
 func (result Report) GetReport() Report {
 	return result
 }
 
-func (result Report) Search(searchStr string) (res Report) {
-	for _, row := range result {
-		if strings.Contains(strconv.Itoa(row.Num), searchStr) {
-			res = append(res, row)
-		}
-		if strings.Contains(strconv.Itoa(row.Id), searchStr) {
-			res = append(res, row)
-		}
-		if strings.Contains(strconv.FormatFloat(row.Quantity, 'f', -1, 64), searchStr) {
-			res = append(res, row)
-		}
-		if strings.Contains(strconv.FormatFloat(row.Price, 'f', -1, 64), searchStr) {
-			res = append(res, row)
-		}
-		if strings.Contains(row.Principal, searchStr) {
-			res = append(res, row)
-		}
-		if strings.Contains(row.Nomenklature, searchStr) {
-			res = append(res, row)
+// функция ищет строки содержащие подстроку в слайсе [][6]string
+// аргументом принимает слайс и подстроку
+// возвращает новый слайс [][6]string
+func Search(data [][6]string, searchStr string) (result [][6]string) {
+	if len(searchStr) == 0 {
+		result = data
+		return
+	}
+	for _, row := range data {
+		for _, val := range row {
+			if strings.Contains(val, searchStr) {
+				result = append(result, row)
+			}
 		}
 	}
 	return

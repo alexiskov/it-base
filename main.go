@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	var searchString string
+	fmt.Scanln(&searchString)
+
 	csvResult, err := csvreport.GetAllDAta("DATA")
 	if err != nil {
 		log.Println(err)
@@ -16,12 +19,14 @@ func main() {
 
 	var reporter bin.Inflater = bin.New()
 
-	err = reporter.InflateFromCSV(csvResult)
+	err = reporter.InflateFromCSV(bin.Search(csvResult, searchString))
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	result := reporter.GetReport()
-	fmt.Println(result)
+	for _, v := range result {
+		fmt.Printf("%+v\n", v)
+	}
 }
