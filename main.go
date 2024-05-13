@@ -19,7 +19,7 @@ func main() {
 
 	var reporter bin.Inflater = bin.New()
 
-	err = reporter.InflateFromCSV(bin.Search(csvResult, searchString))
+	err = reporter.InflateFromCSV(csvResult, searchString)
 	if err != nil {
 		log.Println(err)
 		return

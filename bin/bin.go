@@ -18,7 +18,7 @@ type ReportEntity struct {
 type Report []ReportEntity
 
 type Inflater interface {
-	InflateFromCSV(data [][6]string) error
+	InflateFromCSV(data [][6]string, searchStr string) error
 	GetReport() Report
 }
 
@@ -30,7 +30,8 @@ func New() *Report {
 // наполняет данными переменную типа Report
 // агрументом принимает слайс данных из csv-отчета
 // возвращает ошибку или nil
-func (result *Report) InflateFromCSV(data [][6]string) error {
+func (result *Report) InflateFromCSV(data [][6]string, searchStr string) error {
+	data = search(data, searchStr)
 
 	res := ReportEntity{}
 	for _, row := range data {
@@ -74,7 +75,7 @@ func (result Report) GetReport() Report {
 // функция ищет строки содержащие подстроку в слайсе [][6]string
 // аргументом принимает слайс и подстроку
 // возвращает новый слайс [][6]string
-func Search(data [][6]string, searchStr string) (result [][6]string) {
+func search(data [][6]string, searchStr string) (result [][6]string) {
 	if len(searchStr) == 0 {
 		result = data
 		return
