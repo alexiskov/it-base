@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"log"
 	"main/bin"
+	"main/csvreport"
 )
 
 func main() {
-	var s string
-	fmt.Print("Паттерн: ")
-	fmt.Scanln(&s)
-
-	res, warn, err := bin.Search(s)
+	csvResult, err := csvreport.GetAllDAta("DATA")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	for _, row := range res {
-		fmt.Printf("%+v\n", row)
+	var reporter bin.Inflater = bin.New()
+
+	err = reporter.InflateFromCSV(csvResult)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
-	fmt.Println(warn)
+	result := reporter.GetReport()
+	fmt.Println(result)
 }

@@ -2,65 +2,68 @@ package bin
 
 import (
 	"fmt"
-	"main/csvreader"
-	"os"
-	"strings"
+	"strconv"
 )
 
-func Search(pattern string) (result []csvreader.OtchEntity, warnings []string, err error) {
-	res, warnings, err := getAllDAta("DATA")
-	if err != nil {
-		return
-	}
-
-	for _, row := range res {
-		if strings.Contains(strings.ToLower(row.Nomenklature), strings.ToLower(pattern)) {
-			result = append(result, row)
-		}
-	}
-
-	return
+type ReportEntity struct {
+	Num          int
+	Id           int
+	Principal    string
+	Nomenklature string
+	Quantity     float64
+	Price        float64
 }
 
-func getFoldersPull(path string) (folders []string, err error) {
-	// Открываем текущую директорию
-	dir, err := os.Open(path)
-	if err != nil {
-		err = fmt.Errorf("directory opening error: %s", err)
-		return
-	}
-	defer dir.Close()
+type Report []ReportEntity
 
-	// Получаем список файлов и папок
-	files, err := dir.Readdir(-1)
-	if err != nil {
-		err = fmt.Errorf("folder list reading error: %s", err)
-		return
-	}
-
-	for _, f := range files {
-		if f.IsDir() {
-			folders = append(folders, f.Name())
-		}
-	}
-
-	return
+type Inflater interface {
+	InflateFromCSV(data [][6]string) error
+	GetReport() Report
 }
 
-func getAllDAta(path string) (results []csvreader.OtchEntity, warnings []string, err error) {
-	f, err := getFoldersPull(path)
-	if err != nil {
-		return
-	}
+func New() *Report {
+	return &Report{}
+}
 
-	for _, dir := range f {
-		res, err := csvreader.MatOtchCsvRead(path + "/" + dir + "/otchet.csv")
+// наполняет данными переменную типа Report
+// агрументом принимает путь до файла мат отчета
+// возвращает ошибку или nil
+func (result *Report) InflateFromCSV(data [][6]string) error {
+
+	res := ReportEntity{}
+	for _, row := range data {
+		i, err := strconv.Atoi(row[0])
 		if err != nil {
-			warnings = append(warnings, err.Error())
-			continue
-		} else {
-			results = append(results, res...)
+			return fmt.Errorf("parse res.Num: %s", err)
 		}
+		res.Num = i
+
+		i, err = strconv.Atoi(row[1])
+		if err != nil {
+			return fmt.Errorf("parse res.Id: %s", err)
+		}
+		res.Id = i
+
+		res.Principal = row[2]
+		res.Nomenklature = row[3]
+
+		f, err := strconv.ParseFloat(row[4], 64)
+		if err != nil {
+			return fmt.Errorf("parse res.Quantity: %s", err)
+		}
+		res.Quantity = f
+
+		f, err = strconv.ParseFloat(row[5], 64)
+		if err != nil {
+			return fmt.Errorf("parse res.Price: %s", err)
+		}
+		res.Price = f
+
+		*result = append(*result, res)
 	}
-	return
+	return nil
+}
+
+func (result Report) GetReport() Report {
+	return result
 }
