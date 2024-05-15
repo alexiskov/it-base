@@ -67,7 +67,7 @@ func (result *Report) InflateFromCSV(data [][6]string, searchStr string) error {
 	return nil
 }
 
-// возвращает данные
+// возвращает данные интерфейса
 func (result Report) GetReport() Report {
 	return result
 }
@@ -82,7 +82,7 @@ func search(data [][6]string, searchStr string) (result [][6]string) {
 	}
 	for _, row := range data {
 		for _, val := range row {
-			if strings.Contains(val, searchStr) {
+			if strings.Contains(strings.ToLower(val), strings.ToLower(searchStr)) {
 				result = append(result, row)
 			}
 		}

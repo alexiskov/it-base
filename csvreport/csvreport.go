@@ -81,6 +81,8 @@ func getFoldersPull(path string) (folders []string, err error) {
 	return
 }
 
+// получает данные из всех файлов в целевой директории
+// возвращает слайс данных или ошибку
 func GetAllDAta(path string) (results [][6]string, err error) {
 	f, err := getFoldersPull(path)
 	if err != nil {
